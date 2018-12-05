@@ -13,8 +13,6 @@ before_install:
 script:
   - |-
     gox \
-      -os="linux darwin windows" \
-      -arch="amd64" \
       -output="build/{{.Dir}}_${TRAVIS_TAG}_{{.OS}}_{{.Arch}}" \
       -ldflags " \
         -X github.com/prometheus/common/version.Revision=${TRAVIS_COMMIT} \

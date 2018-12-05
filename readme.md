@@ -1,9 +1,10 @@
 # Smsc balance exporter
 
-The smsc balance exporter allows exporting balance for [smsc gateway](https://smsc.ru)
+The smsc balance exporter for [prometheus](https://prometheus.io) allows exporting balance for [smsc gateway](https://smsc.ru)
 
 ## How it works
-Exporter querying balance every hour (by default) and save it value in memory
+Exporter querying balance every hour (by default) and store it value in memory.
+When prometheus make request, exporter retrieve balance value from memory for make response.
 
 ## Configuration
 You must set environment variables:
@@ -14,7 +15,7 @@ You must set environment variables:
 ## Command-line flags
 
 * `listen-address` - The address to listen on for HTTP requests. (Default: `0.0.0.0:9601`)
-* `interval` - The address to listen on for HTTP requests. (Default: `0.0.0.0:9601`)
+* `interval` - Interval (in seconds) for querying balance. (Default: `0.0.0.0:9601`)
 
 ## Running with systemctl
 
