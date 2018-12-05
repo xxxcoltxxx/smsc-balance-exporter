@@ -1,0 +1,43 @@
+language: go
+sudo: false
+matrix:
+  include:
+    - go: 1.11.x
+
+env:
+  - GO111MODULE=on
+
+before_install:
+  - go get github.com/mitchellh/gox
+
+script:
+  - |-
+    gox \
+      -os="linux darwin windows" \
+      -arch="amd64" \
+      -output="build/{{.Dir}}_${TRAVIS_TAG}_{{.OS}}_{{.Arch}}" \
+      -ldflags " \
+        -X github.com/prometheus/common/version.Revision=${TRAVIS_COMMIT} \
+        -X github.com/prometheus/common/version.Version=${TRAVIS_TAG} \
+        -X github.com/prometheus/common/version.Branch=${TRAVIS_BRANCH} \
+        -X github.com/prometheus/common/version.BuildDate=$(date +'%Y-%m-%d_%H:%M:%S') \
+        -X github.com/prometheus/common/version.BuildUser=${USER} \
+       "
+
+before_deploy:
+  - cd build
+  - chmod +x ./*
+  - for f in *; do tar -czf $f.tar.gz $f && rm $f; done
+  - cd ..
+
+deploy:
+  provider: releases
+  api_key:
+    secure: y3wP/47D+Qee2HX2Vklz/V2gam57PXJoWVPQJc03Mdib9iWkfMAd4rmaI5kcCYSBnC18OGFHpV2bmXefoaNbdwhiC+ReDt3mSRlqfmaQMrt0T/g+r6rMb8KilCuH+OcXu7p7qP1C6aDRovIW6rX46IU6H1BYrOJRIajrI51Uxrv9yp4e2+0pYS67EIPSDUYPe41lxPky3Nq/gYzoMemzV/OckpkyBKE2tMXR3RXgH5ufZFXzhARH0hWTvkfJR58RtXneSsBQ733NX44fl8YYlYGi3wIkeiLCIcI+Mnpjj4nhhtHnaNR0S37qDGwV5oijwaNVJB3cEfg0E6f56ran9oEzx8i7lFTgdrF1r5D/ggPIwEJb9Kvnso2VkIEAVPuTJXTCuyou2woM5VOlIoV7UQndRkqP6F1h68gf+WaF2ju7nogqc8Cv91+M+aCaS0AJMxGGf6kgbADo/17pdxM4yMI95LtwFQNPq0gBpa5pgiWV7eGE0wksuA7CApRLdPk6wDx7bmjY59Q5x4uEOiU+ydUWyijIeFeC8rOfDLvnxDtX2uxpHbWX2Qd1v4L0HzKKsBPEIQgH9XEtN52Ls85bJXwjUxuvL2j76lyiINDjSBRaTr9myKkNan6JkryyWAZl/dIO7/RUBGkzjHWwSIh7Vz5RKtxB1OU7gN2DESum+G8=
+  file_glob: true
+  file: build/*
+  skip_cleanup: true
+  draft: true
+  on:
+    tags: true
+    repo: xxxcoltxxx/smsc-balance-exporter
