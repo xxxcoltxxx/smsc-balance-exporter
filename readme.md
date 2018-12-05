@@ -21,7 +21,7 @@ You must set environment variables:
 
 ```sh
 # Set variables you need
-SMSC_EXPORTER_VERSION=v0.1.0-alpha
+SMSC_EXPORTER_VERSION=v0.1.2-alpha
 SMSC_EXPORTER_PLATFORM=linux
 SMSC_EXPORTER_ARCH=amd64
 
