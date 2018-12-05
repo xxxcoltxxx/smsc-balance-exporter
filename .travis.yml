@@ -3,13 +3,10 @@ sudo: false
 matrix:
   include:
     - go: 1.11.x
-
 env:
   - GO111MODULE=on
-
 before_install:
   - go get github.com/mitchellh/gox
-
 script:
   - |-
     gox \
@@ -21,7 +18,6 @@ script:
         -X github.com/prometheus/common/version.BuildDate=$(date +'%Y-%m-%d_%H:%M:%S') \
         -X github.com/prometheus/common/version.BuildUser=${USER} \
        "
-
 before_deploy:
   - cd build
   - chmod +x ./*
@@ -31,7 +27,7 @@ before_deploy:
 deploy:
   provider: releases
   api_key:
-    secure: y3wP/47D+Qee2HX2Vklz/V2gam57PXJoWVPQJc03Mdib9iWkfMAd4rmaI5kcCYSBnC18OGFHpV2bmXefoaNbdwhiC+ReDt3mSRlqfmaQMrt0T/g+r6rMb8KilCuH+OcXu7p7qP1C6aDRovIW6rX46IU6H1BYrOJRIajrI51Uxrv9yp4e2+0pYS67EIPSDUYPe41lxPky3Nq/gYzoMemzV/OckpkyBKE2tMXR3RXgH5ufZFXzhARH0hWTvkfJR58RtXneSsBQ733NX44fl8YYlYGi3wIkeiLCIcI+Mnpjj4nhhtHnaNR0S37qDGwV5oijwaNVJB3cEfg0E6f56ran9oEzx8i7lFTgdrF1r5D/ggPIwEJb9Kvnso2VkIEAVPuTJXTCuyou2woM5VOlIoV7UQndRkqP6F1h68gf+WaF2ju7nogqc8Cv91+M+aCaS0AJMxGGf6kgbADo/17pdxM4yMI95LtwFQNPq0gBpa5pgiWV7eGE0wksuA7CApRLdPk6wDx7bmjY59Q5x4uEOiU+ydUWyijIeFeC8rOfDLvnxDtX2uxpHbWX2Qd1v4L0HzKKsBPEIQgH9XEtN52Ls85bJXwjUxuvL2j76lyiINDjSBRaTr9myKkNan6JkryyWAZl/dIO7/RUBGkzjHWwSIh7Vz5RKtxB1OU7gN2DESum+G8=
+    secure: BD5nnWULeTzdhYAfPlpy2xciMwVSjGdiaIjC98CjWiaWSsrPGqgsZJ7Ojf30XwRajaXRFKvjDb0zDXzNCEfDBt4NzuTGx/Lu+QpeDuNQLdUn2+ibCsHdQMD3RI3qiy7NjyCXvgdEiloPWsJ6HM3cYB8Jx0FwqUJ4dzyRKdAUvR6k3mKfly5blh2SMIorJRLWJwvkvOsn4UjckhPutFNOuSF7RJB1DbUkQ6xLhaJg+DKWnQRD9t2rMWEuvTdI7g6GEZwKR41SmkRyaWwBGlNIllRTBSGdA0nIT6Dr3vYvCv94RccYuWfz4kXJQVsIxcOu0lKcJFoW1EQiWYY1ExUKmzx/xo4akb4sphnIgQmMubmHflxYsGLl+KMzDfAebrgy8f3fpW2/ZhGbjxqC1GV7VfN8xuIZZni84B/nWlOW+7x1icDWzESFL8pkV0Mk8MKhH2g9D46jYuY/RkXLB/sNgU2DnmHDJtRsp0xGiz6H4qwl/VO8GHpZ3NS6IHLS5ehKtTRJ/xyTE6PINuOFj6UHxNd/UYEJcLDgen6oLWcn2g43VC+F5nSBM805szszaNr9OQ/5MdR07uIOVVnKorXMWVkFM4IbHkDIcbwdKRrOdvUC+9WIJ8aILSGkIdaQh91LwcXygiLzgsLN8vRVoOCIllMXi/hGlFMZlaRz/EXMbKE=
   file_glob: true
   file: build/*
   skip_cleanup: true

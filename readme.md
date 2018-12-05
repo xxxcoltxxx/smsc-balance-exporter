@@ -15,7 +15,7 @@ You must set environment variables:
 ## Command-line flags
 
 * `listen-address` - The address to listen on for HTTP requests. (Default: `0.0.0.0:9601`)
-* `interval` - Interval (in seconds) for querying balance. (Default: `0.0.0.0:9601`)
+* `interval` - Interval (in seconds) for querying balance. (Default: `3600`)
 
 ## Running with systemctl
 
