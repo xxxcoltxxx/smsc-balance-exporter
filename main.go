@@ -16,6 +16,8 @@ import (
     "strconv"
     "syscall"
     "time"
+    "fmt"
+    "strings"
 )
 
 var addr = flag.String("listen-address", "0.0.0.0:9601", "The address to listen on for HTTP requests.")
@@ -45,6 +47,8 @@ func init() {
     )
 
     prometheus.MustRegister(balanceGauge)
+
+    flag.Parse()
 }
 
 func main() {
@@ -121,10 +125,17 @@ func startBalanceUpdater(i int) {
     }
 }
 
+func securePrintf(format string, args ...interface{}) {
+    var message = fmt.Sprintf(format, args...)
+    message = strings.Replace(message, credentials.Login, "<smsc-login>", -1)
+    message = strings.Replace(message, credentials.Password, "<smsc-password>", -1)
+    log.Print(message)
+}
+
 func loadBalance() {
     body, err := loadBody()
     if err != nil {
-        log.Printf("Error fetching balance: %s", err.Error())
+        securePrintf("Error fetching balance: %s", err.Error())
     }
 
     jsonResponse := smscResponse{}
@@ -151,26 +162,26 @@ func loadBody() ([]byte, error) {
     req.URL.RawQuery = q.Encode()
 
     if err != nil {
-        log.Printf("Request error: %s", err.Error())
+        securePrintf("Request error: %s", err.Error())
         return []byte{}, err
     }
 
     res, err := client.Do(req)
     if err != nil {
-        log.Printf("Request error: %s", err.Error())
+        securePrintf("Request error: %s", err.Error())
         return []byte{}, err
     }
 
     defer func() {
         err := res.Body.Close()
         if err != nil {
-            log.Printf("Error close response body: %s", err.Error())
+            securePrintf("Error close response body: %s", err.Error())
         }
     }()
 
     body, err := ioutil.ReadAll(res.Body)
     if err != nil {
-        log.Printf("Error read response: %s", err.Error())
+        securePrintf("Error read response: %s", err.Error())
     }
 
     return body, nil
