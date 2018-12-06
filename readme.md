@@ -17,6 +17,22 @@ You must set environment variables:
 * `listen-address` - The address to listen on for HTTP requests. (Default: `0.0.0.0:9601`)
 * `interval` - Interval (in seconds) for querying balance. (Default: `3600`)
 
+## Running with docker
+
+Build:
+
+```sh
+docker build -t smsc-balance-exporter .
+```
+
+Run:
+
+```sh
+docker run -e SMSC_LOGIN=<your-login> -e SMSC_PASSWORD=<your-password> smsc-balance-exporter \
+    --interval=1800 \
+    --listen-address=0.0.0.0:9601
+```
+
 ## Running with systemctl
 
 ```sh
