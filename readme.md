@@ -32,6 +32,7 @@ docker run \
     -e SMSC_LOGIN=<your-login> \
     -e SMSC_PASSWORD=<your-password> \
     --restart=unless-stopped \
+    -p 9601:9601 \
     -d \
     smsc-balance-exporter \
     --interval=1800 \
