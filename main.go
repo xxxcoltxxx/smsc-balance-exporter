@@ -45,6 +45,8 @@ func init() {
     )
 
     prometheus.MustRegister(balanceGauge)
+
+    flag.Parse()
 }
 
 func main() {
