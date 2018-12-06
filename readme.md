@@ -28,7 +28,12 @@ docker build -t smsc-balance-exporter .
 Run:
 
 ```sh
-docker run -e SMSC_LOGIN=<your-login> -e SMSC_PASSWORD=<your-password> smsc-balance-exporter \
+docker run \
+    -e SMSC_LOGIN=<your-login> \
+    -e SMSC_PASSWORD=<your-password> \
+    --restart=unless-stopped \
+    -d \
+    smsc-balance-exporter \
     --interval=1800 \
     --listen-address=0.0.0.0:9601
 ```
@@ -37,7 +42,7 @@ docker run -e SMSC_LOGIN=<your-login> -e SMSC_PASSWORD=<your-password> smsc-bala
 
 ```sh
 # Set variables you need
-SMSC_EXPORTER_VERSION=v0.1.3-alpha
+SMSC_EXPORTER_VERSION=v0.1.3-beta.1
 SMSC_EXPORTER_PLATFORM=linux
 SMSC_EXPORTER_ARCH=amd64
 SMSC_LOGIN=<your_login>
