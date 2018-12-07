@@ -16,6 +16,8 @@ You must set environment variables:
 
 * `listen-address` - The address to listen on for HTTP requests. (Default: `0.0.0.0:9601`)
 * `interval` - Interval (in seconds) for querying balance. (Default: `3600`)
+* `retry-interval` - "Interval (in seconds) for load balance when errors. (Default: 10)
+* `retry-limit` - "Count of tries when error. (Default: 10)
 
 ## Running with docker
 
@@ -93,18 +95,18 @@ ExecStart=/usr/local/bin/smsc_balance_exporter
 WantedBy=multi-user.target
 ```
 
-Reload systemctl configuration and run service
+Reload systemctl configuration and restart service
 ```sh
 systemctl daemon-reload
 systemctl restart smsc_balance_exporter
 ```
 
-Check service status:
+Show service status:
 ```sh
 systemctl status smsc_balance_exporter
 ```
 
-Check service logs:
+Show service logs:
 ```sh
 journalctl -fu smsc_balance_exporter
 ```
