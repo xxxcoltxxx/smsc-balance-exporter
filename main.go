@@ -21,9 +21,16 @@ import (
 )
 
 var addr = flag.String("listen-address", "0.0.0.0:9601", "The address to listen on for HTTP requests.")
-var interval = flag.Int("interval", 3600, "Interval (in seconds) for querying balance.")
+var interval = flag.Int("interval", 3600, "Interval (in seconds) for request balance.")
+var retryInterval = flag.Int("retry-interval", 10, "Interval (in seconds) for load balance when errors.")
+var retryLimit = flag.Int("retry-limit", 10, "Count of tries when error.")
 
-var balanceGauge *prometheus.GaugeVec
+var (
+    credentials = CredentialsConfig{}
+    balanceGauge *prometheus.GaugeVec
+    hasError     = false
+    retryCount   = 0
+)
 
 type BalanceResponse struct {
     Balance   string `json:"balance"`
@@ -35,8 +42,6 @@ type CredentialsConfig struct {
     Login    string
     Password string
 }
-
-var credentials = CredentialsConfig{}
 
 func init() {
     balanceGauge = prometheus.NewGaugeVec(
@@ -65,7 +70,7 @@ func main() {
         log.Fatalln(err.Error())
     }
 
-    go startBalanceUpdater(*interval)
+    go startBalanceUpdater()
 
     srv := &http.Server{
         Addr:         *addr,
@@ -122,12 +127,27 @@ func readConfig() error {
     return nil
 }
 
-func startBalanceUpdater(i int) {
+func startBalanceUpdater() {
     for {
-        time.Sleep(time.Second * time.Duration(i))
+        if hasError {
+            log.Printf("Request will retry after %d seconds\n", *retryInterval)
+            time.Sleep(time.Second * time.Duration(*retryInterval))
+        } else {
+            time.Sleep(time.Second * time.Duration(*interval))
+        }
 
         if err := loadBalance(); err != nil {
             log.Println(err.Error())
+            hasError = true
+            retryCount++
+            if retryCount >= *retryLimit {
+                log.Printf("Retry limit %d has been exceeded\n", *retryLimit)
+                hasError = false
+                retryCount = 0
+            }
+        } else {
+            hasError = false
+            retryCount = 0
         }
     }
 }
