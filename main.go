@@ -26,7 +26,9 @@ var interval = flag.Int("interval", 3600, "Interval (in seconds) for querying ba
 var balanceGauge *prometheus.GaugeVec
 
 type BalanceResponse struct {
-    Balance string `json:"balance"`
+    Balance   string `json:"balance"`
+    ErrorCode int    `json:"error_code"`
+    Error     string `json:"error"`
 }
 
 type CredentialsConfig struct {
@@ -59,7 +61,10 @@ func main() {
         log.Fatalln("Configuration error:", err.Error())
     }
 
-    loadBalance()
+    if err := loadBalance(); err != nil {
+        log.Fatalln(err.Error())
+    }
+
     go startBalanceUpdater(*interval)
 
     srv := &http.Server{
@@ -84,7 +89,6 @@ func main() {
     log.Printf("Exporter will update balance every %d seconds\n", *interval)
 
     c := make(chan os.Signal, 1)
-
     signal.Notify(c, os.Interrupt)
     signal.Notify(c, syscall.SIGTERM)
 
@@ -121,32 +125,44 @@ func readConfig() error {
 func startBalanceUpdater(i int) {
     for {
         time.Sleep(time.Second * time.Duration(i))
-        loadBalance()
+
+        if err := loadBalance(); err != nil {
+            log.Println(err.Error())
+        }
     }
 }
 
-func securePrintf(format string, args ...interface{}) {
+func hideCredentials(format string, args ...interface{}) string {
     var message = fmt.Sprintf(format, args...)
     message = strings.Replace(message, credentials.Login, "<smsc-login>", -1)
     message = strings.Replace(message, credentials.Password, "<smsc-password>", -1)
-    log.Print(message)
+
+    return message
 }
 
-func loadBalance() {
+func loadBalance() error {
     body, err := loadBody()
     if err != nil {
-        securePrintf("Error fetching balance: %s", err.Error())
+        return err
     }
 
-    jsonResponse := BalanceResponse{}
-    if err := json.Unmarshal(body, &jsonResponse); err != nil {
-        log.Printf("Error fetching balance: %s", err.Error())
+    balanceResponse := BalanceResponse{}
+
+    if err := json.Unmarshal(body, &balanceResponse); err != nil {
+        return errors.New(hideCredentials("Response parse error: %s", err.Error()))
     }
-    if b, err := strconv.ParseFloat(jsonResponse.Balance, 2); err != nil {
-        log.Printf("Cannot parse balance: %s", err.Error())
+
+    if balanceResponse.ErrorCode > 0 {
+        return errors.New(hideCredentials("Response error: %s", balanceResponse.Error))
+    }
+
+    if b, err := strconv.ParseFloat(balanceResponse.Balance, 2); err != nil {
+        return errors.New(hideCredentials("Cannot parse balance: %s", err.Error()))
     } else {
         balanceGauge.With(prometheus.Labels{"service": credentials.Login}).Set(b)
     }
+
+    return nil
 }
 
 func loadBody() ([]byte, error) {
@@ -162,26 +178,24 @@ func loadBody() ([]byte, error) {
     req.URL.RawQuery = q.Encode()
 
     if err != nil {
-        securePrintf("Request error: %s", err.Error())
-        return []byte{}, err
+        return []byte{}, errors.New(hideCredentials("Cannot create request: %s", err.Error()))
     }
 
     res, err := client.Do(req)
     if err != nil {
-        securePrintf("Request error: %s", err.Error())
-        return []byte{}, err
+        return []byte{}, errors.New(hideCredentials("Request error: %s", err.Error()))
     }
 
     defer func() {
         err := res.Body.Close()
         if err != nil {
-            securePrintf("Error close response body: %s", err.Error())
+            log.Println(hideCredentials("Cannot close response body: %s", err.Error()))
         }
     }()
 
     body, err := ioutil.ReadAll(res.Body)
     if err != nil {
-        securePrintf("Error read response: %s", err.Error())
+        return []byte{}, errors.New(hideCredentials("Error read response body: %s", err.Error()))
     }
 
     return body, nil
