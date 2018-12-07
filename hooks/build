@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+docker build \
+    --build-arg SOURCE_COMMIT=${GIT_SHA1} \
+    --build-arg VERSION=${DOCKER_TAG} \
+    --build-arg SOURCE_BRANCH \
+    -t $IMAGE_NAME \
+    .
