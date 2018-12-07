@@ -34,9 +34,7 @@ docker run \
     --restart=unless-stopped \
     -p 9601:9601 \
     -d \
-    smsc-balance-exporter \
-    --interval=1800 \
-    --listen-address=0.0.0.0:9601
+    smsc-balance-exporter
 ```
 
 ## Running with systemctl
