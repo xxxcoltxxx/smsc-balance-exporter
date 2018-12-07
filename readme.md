@@ -64,7 +64,7 @@ docker-compose logs -f smsc-balance-exporter
 
 Set variables you need:
 ```sh
-SMSC_EXPORTER_VERSION=v0.1.3-beta.2
+SMSC_EXPORTER_VERSION=v0.1.3-beta.3
 SMSC_EXPORTER_PLATFORM=linux
 SMSC_EXPORTER_ARCH=amd64
 SMSC_LOGIN=<your_login>
