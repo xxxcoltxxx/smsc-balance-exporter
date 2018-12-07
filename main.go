@@ -5,6 +5,7 @@ import (
     "encoding/json"
     "errors"
     "flag"
+    "fmt"
     "github.com/prometheus/client_golang/prometheus"
     "github.com/prometheus/client_golang/prometheus/promhttp"
     "github.com/prometheus/common/version"
@@ -14,10 +15,9 @@ import (
     "os"
     "os/signal"
     "strconv"
+    "strings"
     "syscall"
     "time"
-    "fmt"
-    "strings"
 )
 
 var addr = flag.String("listen-address", "0.0.0.0:9601", "The address to listen on for HTTP requests.")
@@ -25,23 +25,23 @@ var interval = flag.Int("interval", 3600, "Interval (in seconds) for querying ba
 
 var balanceGauge *prometheus.GaugeVec
 
-type smscResponse struct {
+type BalanceResponse struct {
     Balance string `json:"balance"`
 }
 
-type smscConfig struct {
+type CredentialsConfig struct {
     Login    string
     Password string
 }
 
-var credentials = smscConfig{}
+var credentials = CredentialsConfig{}
 
 func init() {
     balanceGauge = prometheus.NewGaugeVec(
         prometheus.GaugeOpts{
             Subsystem: "balance",
             Name:      "smsc",
-            Help:      "Balance for service in smsc account",
+            Help:      "Balance in smsc account",
         },
         []string{"service"},
     )
@@ -56,12 +56,12 @@ func main() {
     log.Println("Build context", version.BuildContext())
 
     if err := readConfig(); err != nil {
-        log.Println(err.Error())
-        return
+        log.Fatalln("Configuration error:", err.Error())
     }
 
     loadBalance()
     go startBalanceUpdater(*interval)
+
     srv := &http.Server{
         Addr:         *addr,
         WriteTimeout: time.Second * 2,
@@ -80,8 +80,8 @@ func main() {
         log.Fatal(srv.ListenAndServe())
     }()
 
-    log.Printf("Smsc balance exporter has been started at address %s", *addr)
-    log.Printf("Exporter will update balance every %d seconds", *interval)
+    log.Printf("Smsc balance exporter has been started at address %s\n", *addr)
+    log.Printf("Exporter will update balance every %d seconds\n", *interval)
 
     c := make(chan os.Signal, 1)
 
@@ -138,7 +138,7 @@ func loadBalance() {
         securePrintf("Error fetching balance: %s", err.Error())
     }
 
-    jsonResponse := smscResponse{}
+    jsonResponse := BalanceResponse{}
     if err := json.Unmarshal(body, &jsonResponse); err != nil {
         log.Printf("Error fetching balance: %s", err.Error())
     }
