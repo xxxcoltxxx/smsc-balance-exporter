@@ -112,8 +112,10 @@ journalctl -fu smsc_balance_exporter
 ```
 
 ## Example grafana config
+[examples/grafana.json](examples/grafana.json)
 
 ## Example prometheus config
+[examples/prometheus.yaml](examples/prometheus.yaml)
 ```yaml
   - job_name: 'smsc_balance'
     scrape_interval: 1m
@@ -123,6 +125,7 @@ journalctl -fu smsc_balance_exporter
 ```
 
 ## Example alert rules for prometheus
+[examples/prometheus-alert.rules](examples/prometheus-alert.rules)
 ```yaml
 - name: balance
   rules:
