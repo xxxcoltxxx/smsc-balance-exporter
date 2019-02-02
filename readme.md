@@ -110,3 +110,29 @@ Show service logs:
 ```sh
 journalctl -fu smsc_balance_exporter
 ```
+
+## Example grafana config
+
+## Example prometheus config
+```yaml
+  - job_name: 'smsc_balance'
+    scrape_interval: 1m
+    static_configs:
+      - targets:
+        - '10.10.0.10:9601'
+```
+
+## Example alert rules for prometheus
+```yaml
+- name: balance
+  rules:
+
+  - alert: sms_balance
+    expr: sum(balance_smsc) <= 2000
+    for: 1s
+    labels:
+      severity: critical
+    annotations:
+      summary: "sms balance is {{ .Value }} RUB"
+      description: "Top up the balance: https://smsc.ru/payment/"
+```
