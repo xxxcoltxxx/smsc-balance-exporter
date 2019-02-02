@@ -1,0 +1,11 @@
+- name: balance
+  rules:
+
+  - alert: sms_balance
+    expr: sum(balance_smsc) <= 2000
+    for: 1s
+    labels:
+      severity: critical
+    annotations:
+      summary: "sms balance is {{ .Value }} RUB"
+      description: "Top up the balance: https://smsc.ru/payment/"
