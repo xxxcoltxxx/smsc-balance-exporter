@@ -126,7 +126,7 @@ journalctl -fu smsc_balance_exporter
 
 ## Example configs
 ### Example grafana config
-Use [examples/grafana.json](examples/grafana.json) or dashboard: https://grafana.com/dashboards/9752
+Import dashboard from https://grafana.com/dashboards/9752 or use [examples/grafana.json](examples/grafana.json)
 ![Grafana Panel](examples/grafana_panel.png)
 
 ### Example prometheus config
