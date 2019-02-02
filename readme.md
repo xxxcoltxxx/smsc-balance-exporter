@@ -2,6 +2,18 @@
 
 The smsc balance exporter for [prometheus](https://prometheus.io) allows exporting balance for [smsc gateway](https://smsc.ru)
 
+- [How it works](#how-it-works)
+- [Configuration](#configuration)
+- [Command-line flags](#command-line-flags)
+- [Running](#running)
+  * [Running with docker](#running-with-docker)
+  * [Running with docker-compose](#running-with-docker-compose)
+  * [Running with systemctl](#running-with-systemctl)
+- [Example configs](#example-configs)
+  * [Example grafana config](#example-grafana-config)
+  * [Example prometheus config](#example-prometheus-config)
+  * [Example alert rules for prometheus](#example-alert-rules-for-prometheus)
+
 ## How it works
 Exporter querying balance every hour (by default) and store it value in memory.
 When prometheus make request, exporter retrieve balance value from memory for make response.
@@ -19,7 +31,8 @@ You must set environment variables:
 * `retry-interval` - the interval (in seconds) for load balance when errors. (Default: `10`)
 * `retry-limit` - the count of tries when error. (Default: `10`)
 
-## Running with docker
+## Running
+### Running with docker
 
 ```sh
 docker run \
@@ -32,7 +45,7 @@ docker run \
     xxxcoltxxx/smsc-balance-exporter
 ```
 
-## Running with docker-compose
+### Running with docker-compose
 
 Create configuration file. For example, file named `docker-compose.yaml`:
 
@@ -60,7 +73,7 @@ Show service logs:
 docker-compose logs -f smsc-balance-exporter
 ```
 
-## Running with systemctl
+### Running with systemctl
 
 Set variables you need:
 ```sh
@@ -111,10 +124,12 @@ Show service logs:
 journalctl -fu smsc_balance_exporter
 ```
 
-## Example grafana config
+## Example configs
+### Example grafana config
 [examples/grafana.json](examples/grafana.json)
+![Grafana Panel](examples/grafana_panel.png)
 
-## Example prometheus config
+### Example prometheus config
 [examples/prometheus.yaml](examples/prometheus.yaml)
 ```yaml
   - job_name: 'smsc_balance'
@@ -124,7 +139,7 @@ journalctl -fu smsc_balance_exporter
         - '10.10.0.10:9601'
 ```
 
-## Example alert rules for prometheus
+### Example alert rules for prometheus
 [examples/prometheus-alert.rules](examples/prometheus-alert.rules)
 ```yaml
 - name: balance
